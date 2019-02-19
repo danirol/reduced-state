@@ -15,4 +15,4 @@ Nothing else.
 It must run inside really tiny devices (IoT, smartwatches, etc.) where:
 
 - You have to use ES5 compatible code.
-- You have memory constrains: this module doesn't have development features nor warnings or errors. You're an experienced developer so you know how to use work with redux.
+- You have memory constraints: this module doesn't have _development_ features like runtime checks, warnings or errors. You're an experienced developer so you know how to use redux.
