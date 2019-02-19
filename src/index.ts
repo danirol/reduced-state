@@ -10,7 +10,7 @@ interface IConfigureStoreOptions<State> {
   initialState?: State;
 }
 
-type Subscriber = (action: IAction) => void;
+type Subscriber = () => void;
 
 export const configureStore = <State>({
   reducer,
@@ -20,7 +20,7 @@ export const configureStore = <State>({
   const subscribers: Subscriber[] = [];
   const dispatch = (action: IAction) => {
     state = reducer(state, action);
-    subscribers.forEach(subscriber => subscriber(action));
+    subscribers.forEach(subscriber => subscriber());
   };
   const subscribe = (subscriber: Subscriber) => {
     subscribers.push(subscriber);
@@ -39,11 +39,11 @@ export const configureStore = <State>({
 
 export const combineReducers = <State extends { [key: string]: any }>(
   reducers: { [K in keyof State]: Reducer<State[K]> }
-): Reducer<State> => (state, action) =>
-  Object.keys(reducers).reduce(
-    (accState, key) => ({
-      ...accState,
-      [key]: reducers[key](accState[key], action)
-    }),
-    { ...(state || ({} as State)) }
-  );
+): Reducer<State> => (state, action) => {
+  const newState = {} as State;
+  Object.keys(reducers).forEach(key => {
+    newState[key] = reducers[key](state[key], action);
+  });
+
+  return newState;
+};
