@@ -1,9 +1,7 @@
-export interface IAction {
-  type: string;
-  payload?: any;
-}
-
-type Reducer<State> = (state: State | undefined, action: IAction) => State;
+type Reducer<State> = <Action>(
+  state: State | undefined,
+  action: Action
+) => State;
 
 interface IConfigureStoreOptions<State> {
   reducer: Reducer<State>;
@@ -12,13 +10,13 @@ interface IConfigureStoreOptions<State> {
 
 type Subscriber = () => void;
 
-export const configureStore = <State>({
+export const configureStore = <State, Action>({
   reducer,
   initialState
 }: IConfigureStoreOptions<State>) => {
   let state: State = initialState || reducer(undefined, { type: "" });
   const subscribers: Subscriber[] = [];
-  const dispatch = (action: IAction) => {
+  const dispatch = (action: Action) => {
     state = reducer(state, action);
     subscribers.forEach(subscriber => subscriber());
   };
@@ -37,9 +35,9 @@ export const configureStore = <State>({
   };
 };
 
-export const combineReducers = <State extends { [key: string]: any }>(
+export const combineReducers = <State extends {}>(
   reducers: { [K in keyof State]: Reducer<State[K]> }
-): Reducer<State> => (state, action) => {
+): Reducer<State> => (state = {} as State, action) => {
   const newState = {} as State;
   Object.keys(reducers).forEach(key => {
     newState[key] = reducers[key](state[key], action);
